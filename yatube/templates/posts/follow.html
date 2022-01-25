@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% load cache %}
+{% block title %}Последние обновления в подписках{% endblock %}
+{% block content %}
+{% cache 20 index_page page_obj.number %}
+  <div class="container py-5">     
+    <h1 class="card-header">Последние обновления в подписках</h1>
+      {% include 'posts/includes/switcher.html' %}
+      {% for post in page_obj %}
+      {% include 'includes/post_feed.html' with display_group_link=True %}
+        {% if not forloop.last %}<hr>{% endif %}
+      {% endfor %}
+  </div>
+  {% include 'posts/includes/paginator.html' %}
+{% endcache %}
+{% endblock %}
