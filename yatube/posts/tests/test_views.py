@@ -373,7 +373,7 @@ class PostsViewTests(TestCase):
         )
         check_following = Follow.objects.filter(
             author=self.author_first).exists()
-        if check_following is True:
+        if check_following:
             following = get_object_or_404(Follow,
                                           user=self.user_second,
                                           author=self.author_first)
@@ -395,12 +395,13 @@ class PostsViewTests(TestCase):
         """
         object_count = Post.objects.count()
         subscribe = Follow.objects.filter(user=self.user_second,
-                                          author=self.author_first)
-        subscribe_next = Follow.objects.filter(user=self.user,
-                                               author=self.another_author)
+                                          author=self.author_first).exists()
+        subscribe_next = Follow.objects.filter(
+            user=self.user,
+            author=self.another_author).exists()
         author_first_posts = Post.objects.filter(
             author=self.author_first).count()
-        if subscribe is True:
+        if subscribe:
             self.authorized_client_second.get(reverse(
                 'posts:profile_follow',
                 kwargs={'username': self.author_first.username})
@@ -414,7 +415,7 @@ class PostsViewTests(TestCase):
                              'Фактическое количество постов автора '
                              'не совпадает с количеством постов '
                              'в его профиле.')
-        elif subscribe_next is True:
+        elif subscribe_next:
             self.authorized_client.get(reverse(
                 'posts:profile_follow',
                 kwargs={'username': self.author_first.username})
@@ -428,7 +429,7 @@ class PostsViewTests(TestCase):
                                 'Фактическое количество постов автора не '
                                 'совпадает с '
                                 'количеством постов в его профиле.')
-
+        cache.clear()
         new_post = Post.objects.create(text='Brand new post by auth.',
                                        author=self.author_first,
                                        group=self.group_second,
@@ -437,8 +438,7 @@ class PostsViewTests(TestCase):
             author=self.author_first).count()
         self.assertEqual(Post.objects.count(), object_count + ABSTRACT_OBJECT)
         cache.add('new_post', 'Brand new post by auth.')
-
-        if subscribe is True:
+        if subscribe:
             response_follow_index_new = self.authorized_client_second.get(
                 reverse('posts:follow_index')
             )
@@ -446,12 +446,12 @@ class PostsViewTests(TestCase):
                 'post_quantity')
             context_list_new = response_follow_index_new.context.get(
                 'post_list')
-            self.assertEqual(context_follow_index_new, context_list_new,
+            self.assertEqual(context_follow_index_new, len(context_list_new),
                              'Фактическое количество постов автора '
                              'не совпадает с '
                              'количеством постов в его профиле.')
             self.assertIn(new_post, context_list_new)
-        elif subscribe_next is True:
+        elif subscribe_next:
             response_follow_index_next_new = self.authorized_client.get(
                 reverse('posts:follow_index')
             )

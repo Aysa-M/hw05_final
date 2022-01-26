@@ -15,7 +15,7 @@ LETTERS_FOR_TITLE = 30
 
 def index(request):
     """Information which is showing up on the start page."""
-    post_list = Post.objects.all()
+    post_list = Post.objects.select_related('group').all()
     paginator = Paginator(post_list, COUNT_PER_PAGE)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
@@ -128,15 +128,13 @@ def add_comment(request, post_id):
     The view function creates a new comment by a special form.
     """
     post = get_object_or_404(Post, pk=post_id)
-    form = CommentForm()
-    if request.method == 'POST':
-        form = CommentForm(request.POST or None)
-        if form.is_valid():
-            comment = form.save(commit=False)
-            comment.author = request.user
-            comment.post = post
-            comment.save()
-            return redirect('posts:post_detail', post_id=post_id)
+    form = CommentForm(request.POST or None)
+    if form.is_valid():
+        comment = form.save(commit=False)
+        comment.author = request.user
+        comment.post = post
+        comment.save()
+        return redirect('posts:post_detail', post_id=post_id)
 
 
 @login_required
@@ -168,14 +166,9 @@ def profile_follow(request, username):
     """
     user = request.user
     author = get_object_or_404(User, username=username)
-    follower = Follow.objects.filter(user=user, author=author).exists()
-    if author == user:
-        return redirect('posts:profile', username=author.username)
-    elif follower is True:
-        return redirect('posts:profile', username=author.username)
-    else:
-        Follow.objects.create(user=user, author=author)
-        return redirect('posts:profile', username=author.username)
+    if author != user:
+        Follow.objects.get_or_create(user=user, author=author)
+    return redirect('posts:profile', username=author.username)
 
 
 @login_required
@@ -186,7 +179,7 @@ def profile_unfollow(request, username):
     follower = request.user
     author = get_object_or_404(User, username=username)
     subscribe = Follow.objects.filter(user=follower, author=author).exists()
-    if subscribe is True:
+    if subscribe:
         following = get_object_or_404(Follow,
                                       user=follower,
                                       author=author)

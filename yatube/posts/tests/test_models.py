@@ -2,7 +2,7 @@ from django.contrib.auth import get_user_model
 from django.test import TestCase
 from django.conf import settings
 
-from posts.models import Group, Post, Comment
+from posts.models import Group, Post, Comment, Follow
 
 User = get_user_model()
 SYMBOLS = settings.SYMBOLS_FOR_TEXT_POST_STR
@@ -14,6 +14,7 @@ class PostModelTest(TestCase):
     def setUpClass(cls) -> None:
         super().setUpClass()
         cls.user = User.objects.create_user(username='auth')
+        cls.user_second = User.objects.create_user(username='Aysa')
         cls.group = Group.objects.create(
             title='Тестовая группа',
             slug='test-slug',
@@ -28,6 +29,11 @@ class PostModelTest(TestCase):
             post=cls.post,
             author=cls.user,
             text='Комментарий к посту про models'
+        )
+        cls.author = cls.user_second
+        cls.follow = Follow.objects.create(
+            user=cls.user,
+            author=cls.author
         )
 
     def test_post_models_method_str(self):
@@ -58,6 +64,14 @@ class PostModelTest(TestCase):
         test_model_comment = PostModelTest.comment
         expected_value_text = test_model_comment.text[:SYMBOLS]
         self.assertEqual(expected_value_text, str(test_model_comment))
+
+    def test_follow_models_str(self):
+        """
+        Проверяем, что у модели Follow корректно работает метод __str__.
+        """
+        test_model_follow = PostModelTest.follow
+        expected_value_following = test_model_follow.author.username
+        self.assertEqual(expected_value_following, str(test_model_follow))
 
     def test_models_have_correct_help_text(self):
         """Проверяем, что help_text в полях совпадает с ожидаемым."""

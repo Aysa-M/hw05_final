@@ -3,6 +3,7 @@ from django.db import models
 from .validators import validate_not_empty
 from django.conf import settings
 from core.models import CreatedModel
+from django.db.models.constraints import UniqueConstraint
 
 User = get_user_model()
 SYMBOLS = settings.SYMBOLS_FOR_TEXT_POST_STR
@@ -129,8 +130,12 @@ class Follow(CreatedModel):
         related_name='following'
     )
 
-    def __str__(self) -> str:
-        return self.user
+    class Meta:
+        """
+        Внутренний класс Meta для хранения метаданных
+        класса Follow.
+        """
+        UniqueConstraint(fields=['user', 'author'], name='unique_follow')
 
     def __str__(self) -> str:
-        return self.author
+        return self.author.username
