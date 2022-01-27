@@ -2,7 +2,7 @@
 {% load cache %}
 {% block title %}Последние обновления в подписках{% endblock %}
 {% block content %}
-{% cache 20 index_page page_obj.number %}
+{% cache 20 follow_index_page page_obj.number %}
   <div class="container py-5">     
     <h1 class="card-header">Последние обновления в подписках</h1>
       {% include 'posts/includes/switcher.html' %}
