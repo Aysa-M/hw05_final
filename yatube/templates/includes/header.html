@@ -8,6 +8,11 @@
           </a>
           {% with request.resolver_match.view_name as view_name %}
           <ul class="nav nav-pills">
+            <li class="nav-item">
+              <a class="nav-link"
+              href="{% url 'posts:index' %}"
+              >Главная страница</a>
+            </li>
             <li class="nav-item"> 
               <a class="nav-link
                 {% if view_name  == 'about:author' %}
@@ -39,9 +44,12 @@
                   active
                 {% endif %}" href="{% url 'users:logout' %}">Выйти</a>
             </li>
-            <li>
-              Пользователь: {{ user.username }}
-            <li>
+            <li class="nav-item">
+              Пользователь:
+              <a
+              href="{% url 'posts:profile' username=user.username %}"
+              >{{ user.username }}</a>
+            </li>
             {% else %}
             <li class="nav-item"> 
               <a class="nav-link link-light

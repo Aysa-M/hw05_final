@@ -337,6 +337,7 @@ class PostsViewTests(TestCase):
                 'posts:post_detail'))
             self.assertIsInstance(response_from_address,
                                   reverse('posts:post_detail'))
+            self.assertEqual(response_from_address.content, self.comment)
 
     def test_views_profile_follow(self):
         """
@@ -378,6 +379,7 @@ class PostsViewTests(TestCase):
                                           user=self.user_second,
                                           author=self.author_first)
             following.delete()
+
         self.assertEqual(Follow.objects.count(),
                          follow_count - ABSTRACT_OBJECT)
         self.authorized_client_second.get(reverse(

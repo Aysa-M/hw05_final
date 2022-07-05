@@ -21,7 +21,7 @@ class CreationForm(UserCreationForm):
         fields = ('first_name', 'last_name', 'username', 'email')
 
 
-class PasswordChangeForm(PasswordChangeForm):
+class ChangePasswordForm(PasswordChangeForm):
     """
     Класс для создания формы для смену пароля.
     """
@@ -29,7 +29,7 @@ class PasswordChangeForm(PasswordChangeForm):
     fields = ('old_password', 'new_password1', 'new_password2')
 
 
-class PasswordResetForm(PasswordResetForm):
+class ResetPasswordForm(PasswordResetForm):
     """
     Класс для формы отправки письма со ссылкой на смену пароля.
     """

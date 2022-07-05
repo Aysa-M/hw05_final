@@ -2,7 +2,10 @@
   <article>  
     <ul>
       <li>
-        Автор: {{ post.author }}
+        Автор:
+        <a
+        href="{% url 'posts:profile' username=post.author.username %}"
+        target="_blank">@{{ post.author }}</a>
       </li>
       <li>
         Дата публикации: {{ post.pub_date|date:"d E Y" }}
